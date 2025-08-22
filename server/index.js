@@ -4,7 +4,6 @@ const cors = require("cors");
 const app = express();
 const port = 3000;
 
-// Create API router
 const apiRouter = express.Router();
 
 app.use(
