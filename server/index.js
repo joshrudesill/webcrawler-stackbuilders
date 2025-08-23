@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const { crawlWebsite } = require("./util/crawler");
 
 const app = express();
 const port = 3000;
@@ -15,15 +16,18 @@ app.use(
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
+apiRouter.get("/ping", (_, res) => {
+  res.sendStatus(200);
 });
 
-apiRouter.get("/data", (req, res) => {
-  res.json({
-    message: "Data from backend",
-    items: ["item1", "item2", "item3"],
-  });
+apiRouter.get("/crawl", async (req, res) => {
+  try {
+    const data = await crawlWebsite();
+    res.json(data);
+  } catch (e) {
+    console.error(`Error crawling website: ${e.message}`);
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.use("/api", apiRouter);
