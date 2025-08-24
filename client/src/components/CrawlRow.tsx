@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import type { CrawlResult } from "../types";
+import SearchHighlighter from "./SearchHighlighter";
 
 export default function CrawlRow({
   result,
   expandedKey,
   setExpandedIndex,
+  search,
 }: {
   result: CrawlResult;
   expandedKey: number | null;
   setExpandedIndex: (index: number | null) => void;
+  search: string;
 }) {
   const [expanded, setExpanded] = useState<boolean>(false);
 
@@ -60,7 +63,11 @@ export default function CrawlRow({
           Rank <span className="font-normal">{result.rank}</span>
         </div>
         <div className="font-semibold px-2">
-          Title: <span className="font-normal">{result.title}</span>
+          Title:{" "}
+          <span className="font-normal">
+            {" "}
+            <SearchHighlighter needle={search} haystack={result.title} />
+          </span>
         </div>
         <div className="font-semibold px-2">
           Score: <span className="font-normal">{result.score}</span>
