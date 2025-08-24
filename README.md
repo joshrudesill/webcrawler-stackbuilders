@@ -5,10 +5,11 @@
   
 ### Getting started
 1. Clone and `cd` into directory
-2. `cd server` -> `npm install`
-3. `cd ..` -> `cd client` -> `npm install`
-4. Still in client directory `npm run all`
-5. Open [localhost:5173](http://localhost:5173/)
+2. `git checkout server-filtersort`
+3. `cd server` -> `npm install`
+4. `cd ..` -> `cd client` -> `npm install`
+5. Still in client directory `npm run all`
+6. Open [localhost:5173](http://localhost:5173/)
 
 ### Basic Functionality
 When the main `App` component mounts it sends a request to the server with query parameters dictating filters and sorting. The server then gets the content from [YCombinator](https://news.ycombinator.com) and 
