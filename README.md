@@ -1,5 +1,5 @@
 # WebCrawler for YCombinator (main branch)
-> _see server-sortfilter branch for alternate version_
+> _see server-filtersort branch for alternate version_
 ### Requirements
 - Node@latest
   
