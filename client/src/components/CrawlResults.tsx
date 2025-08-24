@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import type { CrawlResult, ServerStatusType } from "../types";
+import type {
+  CrawlResult,
+  Filter,
+  Query,
+  ServerStatusType,
+  SortBy,
+} from "../types";
 import CrawlRow from "./CrawlRow";
-
-type Filter = "eq" | "lte" | "gte" | "none";
-type SortBy = "rank" | "comments" | "score" | "numWords" | "timeStamp";
 
 const filterOptions: Filter[] = ["none", "eq", "lte", "gte"];
 const filterLabels: Record<Filter, string> = {
@@ -30,18 +33,38 @@ const sortLabels: Record<SortBy, string> = {
 export default function CrawlResults({
   data,
   status,
+  fetchData,
 }: {
   data: CrawlResult[];
   status: ServerStatusType;
+  fetchData: (query: Query) => Promise<void>;
 }) {
   const [filter, setFilter] = useState<Filter>("none");
   const [sortBy, setSortBy] = useState<SortBy>("rank");
   const [search, setSearch] = useState<string>("");
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
 
-  const [wordCount, setWordCount] = useState<number | "">("");
+  const [wordCount, setWordCount] = useState<number>(5);
+  const [debouncedWordCount, setDebouncedWordCount] = useState<number>(5);
   const [expandedKey, setExpandedKey] = useState<number | null>(null);
 
-  const [processedData, setProcessedData] = useState<CrawlResult[]>(data);
+  // to prevent a ton of requests while typing - wait 500ms
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // to prevent a ton of requests while typing or using up down arrows - wait 500ms
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedWordCount(wordCount);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [wordCount]);
 
   const updateWordCount = (count: number) => {
     if (count < 0) return;
@@ -50,62 +73,21 @@ export default function CrawlResults({
 
   const updateFilter = (filter: Filter) => {
     setFilter(filter);
-    if (filter === "none") {
-      setWordCount("");
-    } else {
-      setWordCount(5); //default to 5
-    }
-  };
-
-  const applyWordFilter = (data: CrawlResult[]) => {
-    if (filter === "none") return data;
-
-    return data.filter((item) => {
-      const wordCountValue = wordCount === "" ? 0 : wordCount;
-      switch (filter) {
-        case "eq":
-          return item.numWords === wordCountValue;
-        case "lte":
-          return item.numWords <= wordCountValue;
-        case "gte":
-          return item.numWords >= wordCountValue;
-        default:
-          return true;
-      }
-    });
-  };
-
-  const applySearchFilter = (data: CrawlResult[]) => {
-    if (!search) return data;
-    return data.filter((item) =>
-      item.title.toLowerCase().includes(search.toLowerCase())
-    );
-  };
-
-  const sortData = (data: CrawlResult[]) => {
-    let freshCopy = [...data];
-    if (sortBy === "rank") {
-      return freshCopy.sort((a, b) => {
-        if (a[sortBy] < b[sortBy]) return -1;
-        if (a[sortBy] > b[sortBy]) return 1;
-        return 0;
-      });
-    }
-    return freshCopy.sort((a, b) => {
-      if (a[sortBy] > b[sortBy]) return -1;
-      if (a[sortBy] < b[sortBy]) return 1;
-      return 0;
-    });
   };
 
   useEffect(() => {
-    if (data.length > 0) {
-      let out = applyWordFilter(data);
-      out = sortData(out);
-      out = applySearchFilter(out);
-      setProcessedData(out);
+    let query: Query = {
+      search: debouncedSearch,
+      wordOperator: filter,
+      sortBy: sortBy,
+      wordCount: debouncedWordCount.toString(),
+    };
+
+    if (wordCount === debouncedWordCount && debouncedSearch === search) {
+      // to prevent debounce to send double queries when resetting ^
+      fetchData(query);
     }
-  }, [data, filter, wordCount, sortBy, search]);
+  }, [filter, debouncedWordCount, sortBy, debouncedSearch, search, wordCount]);
 
   return (
     <div className="mb-10">
@@ -161,7 +143,7 @@ export default function CrawlResults({
 
           {filter !== "none" && <div>Words</div>}
           <div className="font-semibold flex-grow text-right">
-            Count: {processedData.length}
+            Count: {data.length}
           </div>
 
           <div>
@@ -169,7 +151,6 @@ export default function CrawlResults({
               className="bg-red-500 text-white p-2 rounded cursor-pointer"
               onClick={() => {
                 setFilter("none");
-                setWordCount("");
                 setSortBy("rank");
                 setSearch("");
               }}
@@ -195,10 +176,10 @@ export default function CrawlResults({
       <div className="flex flex-col gap-2 ">
         {status === "Fetching" ? (
           <div className="text-2xl font-bold mt-2">Loading...</div>
-        ) : processedData.length === 0 ? (
+        ) : data.length === 0 ? (
           <div className="text-2xl font-bold mt-2">Nothing here..</div>
         ) : (
-          processedData.map((result) => (
+          data.map((result) => (
             <CrawlRow
               key={result.elementId}
               result={result}

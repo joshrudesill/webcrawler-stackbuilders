@@ -10,3 +10,12 @@ export type CrawlResult = {
   timeStamp: string;
   user: string;
 };
+export type Filter = "eq" | "lte" | "gte" | "none";
+export type SortBy = "rank" | "comments" | "score" | "numWords" | "timeStamp";
+
+export type Query = {
+  search: string;
+  wordOperator: Filter;
+  sortBy: SortBy;
+  wordCount: string;
+};

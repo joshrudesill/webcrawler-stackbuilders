@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const { crawlWebsite } = require("./util/crawler");
+const { sortAndFilter } = require("./util/sortAndFilter");
 
 // const path = require("path"); - for theoretically deploying
 
@@ -24,7 +25,14 @@ apiRouter.get("/ping", (_, res) => {
 
 apiRouter.get("/crawl", async (req, res) => {
   try {
-    const data = await crawlWebsite();
+    let data = await crawlWebsite();
+    data = sortAndFilter(
+      data,
+      req.query.sortBy,
+      req.query.wordCount,
+      req.query.wordOperator,
+      req.query.search
+    );
     res.json(data);
   } catch (e) {
     console.error(`Error crawling website: ${e.message}`);

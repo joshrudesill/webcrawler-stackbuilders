@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import RequestButtons from "./components/RequestButtons";
 import ServerStatus from "./components/ServerStatus";
-import type { CrawlResult, ServerStatusType } from "./types";
+import type { CrawlResult, ServerStatusType, Query } from "./types";
 import CrawlResults from "./components/CrawlResults";
 
 function App() {
@@ -19,10 +19,11 @@ function App() {
       setStatus("Down");
     }
   };
-  const fetchData = async () => {
+  const fetchData = async (query: Query) => {
     try {
       setStatus("Fetching");
-      const response = await fetch("/api/crawl");
+      let params = new URLSearchParams(query);
+      const response = await fetch(`/api/crawl?${params.toString()}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -39,7 +40,6 @@ function App() {
 
   useEffect(() => {
     pingServer();
-    fetchData();
   }, []);
 
   return (
@@ -50,14 +50,10 @@ function App() {
       </div>
       <div className="flex flex-row gap-2 items-center justify-between">
         <ServerStatus status={status} />
-        <RequestButtons
-          pingServer={pingServer}
-          fetchData={fetchData}
-          status={status}
-        />
+        <RequestButtons pingServer={pingServer} status={status} />
       </div>
       <div>
-        <CrawlResults data={results} status={status} />
+        <CrawlResults data={results} status={status} fetchData={fetchData} />
       </div>
     </div>
   );
