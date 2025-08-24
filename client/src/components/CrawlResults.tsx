@@ -208,6 +208,7 @@ export default function CrawlResults({
               result={result}
               setExpandedIndex={setExpandedKey}
               expandedKey={expandedKey}
+              search={search}
             />
           ))
         )}
