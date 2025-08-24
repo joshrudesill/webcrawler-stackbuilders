@@ -22,7 +22,7 @@ export default function RequestButtons({
           className="bg-green-500 text-white p-2 rounded cursor-pointer"
           onClick={fetchData}
         >
-          Crawl YCombinator
+          Re-Crawl YCombinator
         </button>
       </div>
     </>

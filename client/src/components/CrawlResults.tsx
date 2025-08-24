@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-import type { CrawlResult } from "../types";
+import type { CrawlResult, ServerStatusType } from "../types";
+import CrawlRow from "./CrawlRow";
 
-type Filter = "eq" | "lt" | "gt" | "none";
+type Filter = "eq" | "lte" | "gte" | "none";
 type SortBy = "rank" | "comments" | "score";
 
-const filterOptions: Filter[] = ["none", "eq", "lt", "gt"];
+const filterOptions: Filter[] = ["none", "eq", "lte", "gte"];
 const filterLabels: Record<Filter, string> = {
   none: "No Filter",
   eq: "Equal to",
-  lt: "Less Than",
-  gt: "Greater Than",
+  lte: "Less Than or Equal to",
+  gte: "Greater Than or Equal to",
 };
 const sortOptions: SortBy[] = ["rank", "comments", "score"];
 const sortLabels: Record<SortBy, string> = {
@@ -18,10 +19,17 @@ const sortLabels: Record<SortBy, string> = {
   score: "Score",
 };
 
-export default function CrawlResults({ data }: { data: CrawlResult[] }) {
+export default function CrawlResults({
+  data,
+  status,
+}: {
+  data: CrawlResult[];
+  status: ServerStatusType;
+}) {
   const [filter, setFilter] = useState<Filter>("none");
   const [sortBy, setSortBy] = useState<SortBy>("rank");
   const [wordCount, setWordCount] = useState<number | "">("");
+  const [expandedKey, setExpandedKey] = useState<number | null>(null);
 
   const [processedData, setProcessedData] = useState<CrawlResult[]>(data);
 
@@ -47,10 +55,10 @@ export default function CrawlResults({ data }: { data: CrawlResult[] }) {
       switch (filter) {
         case "eq":
           return item.numWords === wordCountValue;
-        case "lt":
-          return item.numWords < wordCountValue;
-        case "gt":
-          return item.numWords > wordCountValue;
+        case "lte":
+          return item.numWords <= wordCountValue;
+        case "gte":
+          return item.numWords >= wordCountValue;
         default:
           return true;
       }
@@ -80,7 +88,7 @@ export default function CrawlResults({ data }: { data: CrawlResult[] }) {
   }, [data, filter, wordCount, sortBy]);
 
   return (
-    <div>
+    <div className="mb-10">
       <h2 className="font-bold mb-2">Crawl Results</h2>
       <div className="flex gap-3 items-center border-1 p-2 rounded border-gray-500 bg-gray-200">
         <div>
@@ -116,37 +124,49 @@ export default function CrawlResults({ data }: { data: CrawlResult[] }) {
               </option>
             ))}
           </select>
-          <input
-            type="number"
-            className="border p-0.5 rounded"
-            width={20}
-            value={wordCount}
-            disabled={filter === "none"}
-            onChange={(e) => updateWordCount(Number(e.target.value))}
-          />
+          {filter !== "none" && (
+            <>
+              <input
+                type="number"
+                className="border p-0.5 rounded"
+                width={20}
+                value={wordCount}
+                onChange={(e) => updateWordCount(Number(e.target.value))}
+              />
+            </>
+          )}
         </div>
-        <div className="flex-grow text-left">Words</div>
-        <p className="font-semibold">Count: {processedData.length}</p>
+        {filter !== "none" && <div>Words</div>}
+        <div className="font-semibold flex-grow text-right">
+          Count: {processedData.length}
+        </div>
+        <div>
+          <button
+            className="bg-red-500 text-white p-2 rounded cursor-pointer"
+            onClick={() => {
+              setFilter("none");
+              setWordCount("");
+            }}
+          >
+            Reset
+          </button>
+        </div>
       </div>
       <div className="flex flex-col gap-2 ">
-        {processedData.map((result) => (
-          <div key={result.elementId} className="flex border-b py-2 gap-1">
-            <div className="font-semibold">
-              Rank <span className="font-normal">{result.rank}</span>.{" |"}
-            </div>
-            <div className="font-semibold">
-              Title: <span className="font-normal">{result.title}</span>
-              {" |"}
-            </div>
-            <div className="font-semibold">
-              Score: <span className="font-normal">{result.score}</span>
-              {" |"}
-            </div>
-            <div className="font-semibold">
-              Comments: <span className="font-normal">{result.comments}</span>
-            </div>
-          </div>
-        ))}
+        {status === "Fetching" ? (
+          <div className="text-2xl font-bold mt-2">Loading...</div>
+        ) : processedData.length === 0 ? (
+          <div className="text-2xl font-bold mt-2">Nothing here..</div>
+        ) : (
+          processedData.map((result) => (
+            <CrawlRow
+              key={result.elementId}
+              result={result}
+              setExpandedIndex={setExpandedKey}
+              expandedKey={expandedKey}
+            />
+          ))
+        )}
       </div>
     </div>
   );

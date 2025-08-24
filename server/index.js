@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const { crawlWebsite } = require("./util/crawler");
 
+// const path = require("path"); - for theoretically deploying
+
 const app = express();
 const port = 3000;
 
@@ -31,6 +33,8 @@ apiRouter.get("/crawl", async (req, res) => {
 });
 
 app.use("/api", apiRouter);
+
+// app.use(express.static(path.join(__dirname, "../client/dist"))); - for theoretically deploying
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);

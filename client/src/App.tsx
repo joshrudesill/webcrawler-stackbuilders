@@ -34,10 +34,11 @@ function App() {
 
   useEffect(() => {
     pingServer();
+    fetchData();
   }, []);
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="max-w-screen-xl mx-auto px-4 mt-5 ">
       <div className="bg-gray-100 p-4 rounded-lg shadow-md mb-4">
         Stack Builders WebCrawler -{" "}
         <span className="font-bold">YCombinator</span>
@@ -47,7 +48,7 @@ function App() {
         <RequestButtons pingServer={pingServer} fetchData={fetchData} />
       </div>
       <div>
-        <CrawlResults data={results} />
+        <CrawlResults data={results} status={status} />
       </div>
     </div>
   );

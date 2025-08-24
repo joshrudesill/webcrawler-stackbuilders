@@ -19,13 +19,18 @@ async function crawlWebsite(url = "https://news.ycombinator.com/") {
     $submissions.each((_, element) => {
       let $element = $(element);
       let $elementInfo = $($element.next());
+
       let title = $element.find(".titleline > a").text();
-      let rank = $element.find(".rank").text().replace(".", "");
       let link = $element.find(".titleline > a").attr("href");
+
+      let rank = $element.find(".rank").text().replace(".", "");
 
       let $subline = $elementInfo.find(".subline");
 
       let elementId = $element.attr("id");
+
+      let timeStamp = $elementInfo.find(".age").attr("title").split(" ")[0];
+      let user = $elementInfo.find(".hnuser").text();
 
       let score = 0;
       let comments = 0;
@@ -61,7 +66,8 @@ async function crawlWebsite(url = "https://news.ycombinator.com/") {
         isNaN(elementId) ||
         isNaN(score) ||
         isNaN(comments) ||
-        isNaN(numWords)
+        isNaN(numWords) ||
+        !timeStamp
       ) {
         console.warn(`Invalid rank or elementId for element:`, {
           title,
@@ -71,11 +77,23 @@ async function crawlWebsite(url = "https://news.ycombinator.com/") {
           comments,
           score,
           numWords,
+          timeStamp,
+          user,
         });
         throw new Error("Submission has unexpected values");
       }
 
-      result.push({ rank, title, link, score, comments, elementId, numWords });
+      result.push({
+        rank,
+        title,
+        link,
+        score,
+        comments,
+        elementId,
+        numWords,
+        timeStamp,
+        user,
+      });
     });
 
     return result;

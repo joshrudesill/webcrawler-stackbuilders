@@ -7,4 +7,6 @@ export type CrawlResult = {
   comments: number;
   elementId: number;
   numWords: number;
+  timeStamp: string;
+  user: string;
 };
