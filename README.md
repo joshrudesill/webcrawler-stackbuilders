@@ -15,6 +15,11 @@ When the main `App` component mounts it sends a request to the server which gets
 It pulls everything available from each post, title, rank, points, user, number of comments, the link, and the timestamp. It also counts the words excluding special characters. This array of 30 posts is sent back to the client
 where it is passed through filters and sorted based on which options are selected. Each post can be expanded by clicking it. 
 
+### Thoughts
+- In server/index.js usually routers have their own file and directory, since there is just one router I left it in the main file.
+- In client/src/components, there could potentially be more directory organization, but for the purposes of this small project, I think it is Ok as is.
+- In client/src/components/CrawlResults.tsx, both of the select + labels elements for filtering and sorting could be made into one component to reduce reused code. But again, for the purpose of this project, I didn't think it was necessary.
+
 ### Tests
 1. In client directory run `npm run test`
 2. In cypress window -> Component Testing -> Choose your browser preference
