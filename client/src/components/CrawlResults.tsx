@@ -133,7 +133,7 @@ export default function CrawlResults({
 
           <div>
             <label htmlFor="filter" className="me-1">
-              Filter:
+              Word Count Filter:
             </label>
             <select
               id="filter"
