@@ -25,8 +25,6 @@ async function crawlWebsite(url = "https://news.ycombinator.com/") {
 
       let rank = $element.find(".rank").text().replace(".", "");
 
-      let $subline = $elementInfo.find(".subline");
-
       let elementId = $element.attr("id");
 
       let timeStamp = $elementInfo.find(".age").attr("title").split(" ")[0];
@@ -34,6 +32,7 @@ async function crawlWebsite(url = "https://news.ycombinator.com/") {
 
       let score = 0;
       let comments = 0;
+      let $subline = $elementInfo.find(".subline");
 
       if ($subline.length === 0) {
         // If there isn't a .subline we know it's just a time and hide button

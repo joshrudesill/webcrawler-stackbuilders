@@ -18,7 +18,8 @@ export default function CrawlRow({
 
   const formatTimeAgo = (timestamp: string) => {
     const now = new Date();
-    const time = new Date(timestamp);
+    const time = new Date(`${timestamp}Z`); // add z so date is constructed with UTC time
+
     const diffInSeconds = Math.floor((now.getTime() - time.getTime()) / 1000);
 
     // less than 1 minute
@@ -46,11 +47,7 @@ export default function CrawlRow({
   };
 
   useEffect(() => {
-    if (expandedKey === result.elementId) {
-      setExpanded(true);
-    } else {
-      setExpanded(false);
-    }
+    setExpanded(expandedKey === result.elementId);
   }, [expandedKey]);
 
   return (
@@ -82,7 +79,10 @@ export default function CrawlRow({
             </span>
           </div>
           <div className="text-sm px-2">
-            User: <span className="text-gray-500">{result.user}</span>
+            User:{" "}
+            <span className="text-gray-500">
+              {result.user || "YCombinator"}
+            </span>
           </div>
           <a
             className="text-sm font-bold px-2 underline cursor-pointer"

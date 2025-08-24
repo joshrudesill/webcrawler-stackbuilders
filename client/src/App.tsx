@@ -23,12 +23,17 @@ function App() {
     try {
       setStatus("Fetching");
       const response = await fetch("/api/crawl");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
       setResults(data as CrawlResult[]);
       setStatus("Running");
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.log("Error fetching data:", error);
+      alert("Error fetching data - check server status and try again.");
       setStatus("Down");
+      setResults([]);
     }
   };
 
@@ -45,7 +50,11 @@ function App() {
       </div>
       <div className="flex flex-row gap-2 items-center justify-between">
         <ServerStatus status={status} />
-        <RequestButtons pingServer={pingServer} fetchData={fetchData} />
+        <RequestButtons
+          pingServer={pingServer}
+          fetchData={fetchData}
+          status={status}
+        />
       </div>
       <div>
         <CrawlResults data={results} status={status} />
