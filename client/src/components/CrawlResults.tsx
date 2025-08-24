@@ -117,6 +117,7 @@ export default function CrawlResults({
               Sort By:
             </label>
             <select
+              data-testid="sort-select"
               id="sort"
               className="border p-1 rounded bg-gray-50"
               value={sortBy}
@@ -136,6 +137,7 @@ export default function CrawlResults({
             </label>
             <select
               id="filter"
+              data-testid="filter-select"
               className="border p-1 rounded me-1 bg-gray-50"
               value={filter}
               onChange={(e) => updateFilter(e.target.value as Filter)}
@@ -150,6 +152,7 @@ export default function CrawlResults({
               <>
                 <input
                   type="number"
+                  data-testid="word-count-input"
                   className="border p-0.5 rounded"
                   width={20}
                   value={wordCount}
@@ -167,6 +170,7 @@ export default function CrawlResults({
           <div>
             <button
               className="bg-red-500 text-white p-2 rounded cursor-pointer"
+              data-testid="reset-button"
               onClick={() => {
                 setFilter("none");
                 setWordCount("");

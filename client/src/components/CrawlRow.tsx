@@ -51,7 +51,10 @@ export default function CrawlRow({
   }, [expandedKey]);
 
   return (
-    <div className="flex flex-col border-b cursor-pointer">
+    <div
+      className="flex flex-col border-b cursor-pointer"
+      data-testid="crawl-row"
+    >
       <div
         className="flex py-2 gap-1 divide-x divide-gray-500"
         onClick={updateExpandedState}
